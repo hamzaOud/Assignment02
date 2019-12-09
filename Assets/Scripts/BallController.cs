@@ -7,14 +7,13 @@ public class BallController : MonoBehaviour
     public Rigidbody rb;
     public bool hasBallEnteredCollider = false;
     public int numberFallen = 0;
-    public float noMovementThreshold = 0.0001f;
+    public float noMovementThreshold;
     private const int noMovementFrames = 3;
     Vector3[] previousLocations = new Vector3[noMovementFrames];
     public bool isMoving;
     public Vector3 forceToAdd;
 
     Vector3 ballStartPosition;
-    float speed = 0.1f;
 
     // Start is called before the first frame update
     void Start()
@@ -64,12 +63,11 @@ public class BallController : MonoBehaviour
     {
         rb.constraints = RigidbodyConstraints.None;
         transform.position = ballStartPosition;
-
-
         rb.velocity = Vector3.zero;
 
         transform.rotation = Quaternion.Euler(0f, 0f, 0f);
-        //rb.AddForce(0, 0, 15, ForceMode.Impulse);
         rb.AddForce(forceToAdd, ForceMode.Impulse);
+        print(isMoving);
+
     }
 }

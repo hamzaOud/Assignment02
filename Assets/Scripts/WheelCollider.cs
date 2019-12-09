@@ -21,11 +21,15 @@ public class WheelCollider : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        if (other.gameObject.tag == "Ball")
+        {
+            int number = int.Parse(this.gameObject.name);
+            ballController.hasBallEnteredCollider = true;
+            ballController.numberFallen = number;
+            gameController.lastNumbers = number;
 
-        int number = int.Parse(this.gameObject.name);
-        ballController.hasBallEnteredCollider = true;
-        ballController.numberFallen = number;
-        gameController.lastNumbers = number;
+        }
+
 
         //print(ballController.numberFallen);
     }

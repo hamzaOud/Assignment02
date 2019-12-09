@@ -21,22 +21,29 @@ public class GameController : MonoBehaviour
     //These are our variables that are defined by the user input
     public List<Bet> currentBet;// This is all the bets that the player has on the table.
     public List<Bet> lastBet;//Previous bet, if the player wants to repeat the last bet
-    public float balance; //The balance of the player
+    public int balance; //The balance of the player
     public int selectedChipValue;
+
+    private AudioSource audioSource;
 
     int random = 0;
 
     void Start()
     {
+        #if UNITY_ANDROID
+        Screen.orientation = ScreenOrientation.Landscape;
+        #endif
+
         //populating data
         selectedChipValue = 5;
         rouletteNumbers = new RouletteNumber[37];
         PopulateNumbers();
         betOptions = new BetOption[46];
         PopulateBetOptions();
-        balance = 500;
+        balance = PlayerPrefs.GetInt("Balance");
         uiController.UpdateBalanceUI();
         uiController.repeatButton.interactable = false;
+        audioSource = GetComponent<AudioSource>();
     }
 
     void Update()
@@ -68,6 +75,7 @@ public class GameController : MonoBehaviour
     void UpdateBalance(int earnings)
     {
         balance = balance + earnings;
+        PlayerPrefs.SetInt("Balance", balance);
     }
 
     void PopulateNumbers()
@@ -256,18 +264,26 @@ public class GameController : MonoBehaviour
 
         currentBet.Clear();
         updateUI();
+        uiController.ChangeLastNumberText();
 
     }
 
     private void Spin()
     {
+
+        audioSource.Stop();
+        audioSource.Play();
+
         ballController.SpinBall();
 
         while (ballController.isMoving)
         { random++; }
 
-        lastNumbers = ballController.numberFallen;
-        print(lastNumbers);
+        if (!ballController.isMoving && ballController.hasBallEnteredCollider)
+        {
+            lastNumbers = ballController.numberFallen;
+            print(lastNumbers);
+        }
     }
 
     public void AddBet(Bet betToAdd)
@@ -276,6 +292,7 @@ public class GameController : MonoBehaviour
 
         //Update Balance
         balance = balance - selectedChipValue;
+        PlayerPrefs.SetInt("Balance", balance);
         updateUI();
     }
 
@@ -283,6 +300,7 @@ public class GameController : MonoBehaviour
     {
         betToUpdate.stake += amountToAdd;
         balance = balance - amountToAdd;
+        PlayerPrefs.SetInt("Balance", balance);
         updateUI();
     }
 

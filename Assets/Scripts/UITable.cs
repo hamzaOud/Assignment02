@@ -28,6 +28,11 @@ public class UITable : MonoBehaviour
     {
         int numberChosen = Int32.Parse(EventSystem.current.currentSelectedGameObject.name);
 
+        if (gameController.balance < gameController.selectedChipValue)
+        {
+            return;
+        }
+
         bool betExists = false;
         int betIndex = 0;
         for (int i = 0; i < gameController.currentBet.Count; i++)

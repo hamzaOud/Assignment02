@@ -14,22 +14,25 @@ public class UIController : MonoBehaviour
     public Button repeatButton;
     public Button betButton;
 
+    public Button[] chipButtons;
+
     // Start is called before the first frame update
     void Start()
     {
         UpdateBalanceUI();
+        chipButtons[0].image.color = Color.cyan;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(gameController.ballController.isMoving)
-        {
-            betButton.interactable = false;
-        }
-        else
+        if(!gameController.ballController.isMoving && gameController.currentBet.Count > 0)
         {
             betButton.interactable = true;
+        }
+        else 
+        {
+            betButton.interactable = false;
         }
     }
 
@@ -49,6 +52,7 @@ public class UIController : MonoBehaviour
         foreach(Bet bet in gameController.currentBet)
         {
             gameController.balance += bet.stake;
+            PlayerPrefs.SetInt("Balance", gameController.balance);
         }
         gameController.currentBet.Clear();
         gameController.updateUI();
@@ -56,8 +60,21 @@ public class UIController : MonoBehaviour
 
     public void ChangeChipValue()
     {
+
         currentChipValue = Int32.Parse(EventSystem.current.currentSelectedGameObject.name);
         gameController.selectedChipValue = currentChipValue;
+
+        for(int i = 0; i < chipButtons.Length;i++)
+        {
+            if (currentChipValue.ToString() == chipButtons[i].name)
+            {
+                chipButtons[i].image.color = Color.cyan;
+            }
+            else
+            {
+                chipButtons[i].image.color = Color.white;
+            }
+        }
     }
 
     public void ChangeLastNumberText()
