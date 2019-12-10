@@ -4,6 +4,7 @@ using UnityEngine;
 using System.Linq;
 using UnityEngine.UI;
 using System;
+using System.Diagnostics.Contracts;
 
 public class GameController : MonoBehaviour
 {
@@ -242,33 +243,7 @@ public class GameController : MonoBehaviour
 
     }
 
-    public void BetSpinWheel()
-    {
-        uiController.repeatButton.interactable = true;
-
-        /*System.Random rnd = new System.Random();
-        int randomNumber = rnd.Next(0, 36);
-        lastNumbers = randomNumber;
-        uiController.ChangeLastNumberText();*/
-
-        Spin();
-
-        int earnings = CalculateEarnings(currentBet.ToArray(), lastNumbers);
-        UpdateBalance(earnings);
-
-        lastBet.Clear();
-        foreach(Bet bet in currentBet)
-        {
-            lastBet.Add(bet);
-        }
-
-        currentBet.Clear();
-        updateUI();
-        uiController.ChangeLastNumberText();
-
-    }
-
-    private void Spin()
+    private IEnumerator BetSpinWheelCoroutine(GameController instance)
     {
 
         audioSource.Stop();
@@ -276,14 +251,36 @@ public class GameController : MonoBehaviour
 
         ballController.SpinBall();
 
-        while (ballController.isMoving)
-        { random++; }
+        yield return new WaitForSeconds(0.5f);
+        //yield return new WaitUntil(() => !ballController.isMoving);
+        yield return new WaitWhile(() => ballController.isMoving);
 
         if (!ballController.isMoving && ballController.hasBallEnteredCollider)
         {
             lastNumbers = ballController.numberFallen;
             print(lastNumbers);
         }
+
+        int earnings = CalculateEarnings(currentBet.ToArray(), lastNumbers);
+        UpdateBalance(earnings);
+
+        lastBet.Clear();
+        foreach (Bet bet in currentBet)
+        {
+            lastBet.Add(bet);
+        }
+
+        currentBet.Clear();
+        updateUI();
+        uiController.ChangeLastNumberText();
+        uiController.repeatButton.interactable = true;
+    }
+
+
+    public void BetSpinWheel()
+    {
+        StartCoroutine(BetSpinWheelCoroutine(this));
+
     }
 
     public void AddBet(Bet betToAdd)

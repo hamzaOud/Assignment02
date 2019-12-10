@@ -67,7 +67,12 @@ public class BallController : MonoBehaviour
 
         transform.rotation = Quaternion.Euler(0f, 0f, 0f);
         rb.AddForce(forceToAdd, ForceMode.Impulse);
-        print(isMoving);
+        Invoke("Tester", 0.3f);
 
+    }
+
+    void Tester()
+    {
+        print(isMoving);
     }
 }
